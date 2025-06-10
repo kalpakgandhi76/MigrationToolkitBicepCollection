@@ -1,0 +1,70 @@
+
+name: Build and deploy an app to ACA
+
+on:
+  workflow_dispatch:
+    inputs:
+      imageName:
+        description: 'Container image name (e.g., myacr.azurecr.io/app:latest)'
+        default: 'anycompanyacr.azurecr.io/salesapi:latest'     
+        required: true
+      resourceGroup:
+        description: 'Azure Resource Group'
+        default: 'test-aca-accelerator'
+        required: true
+      containerAppName:
+        description: 'Azure Container App name'
+        default: 'newbusiness-api'
+        required: true
+      containerAppEnv:
+        description: 'Container App Environment name'
+        required: true
+        default: 'test-env2'
+      acrName:
+        description: 'Azure Container Registry name (e.g., myacr)'
+        required: true
+        default: 'anycompanyacr'
+      location:
+        description: 'Azure Region (e.g., eastus)'
+        required: true
+        default: 'west us'
+
+jobs:
+  
+  deploy:
+    needs: buildImage
+    permissions:
+      actions: read
+      contents: read
+      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+    # Checks out the repository this file is in
+    - uses: actions/checkout@v4
+
+    # Logs in with your Azure credentials
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }} # Azure service principal credentials
+        enable-AzPSSession: false
+        environment: azurecloud
+        allow-no-subscriptions: false
+        audience: api://AzureADTokenExchange
+        auth-type: SERVICE_PRINCIPAL
+
+    - name: Deploy to ACA
+      run: |
+        az config set extension.use_dynamic_install=yes_without_prompt
+
+        az containerapp update \
+          --name ${{ github.event.inputs.containerAppName }} \
+          --resource-group ${{ github.event.inputs.resourceGroup }} \
+          --image ${{ github.event.inputs.imageName }} \
+          --environment ${{ github.event.inputs.containerAppEnv }} \
+          --registry-server "${{ github.event.inputs.acrName }}.azurecr.io" \
+          --query properties.configuration.activeRevisionsMode \
+          --output table
+
+    - name: Logout from Azure
+      run: az logout
