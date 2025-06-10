@@ -60,8 +60,8 @@ jobs:
           --name ${{ github.event.inputs.containerAppName }} \
           --resource-group ${{ github.event.inputs.resourceGroup }} \
           --image ${{ github.event.inputs.imageName }} \
-          --environment ${{ github.event.inputs.containerAppEnv }} \
-          --registry-server "${{ github.event.inputs.acrName }}.azurecr.io" \
+         # --environment ${{ github.event.inputs.containerAppEnv }} \
+         # --registry-server "${{ github.event.inputs.acrName }}.azurecr.io" \
           --query properties.configuration.activeRevisionsMode \
           --output table
 
