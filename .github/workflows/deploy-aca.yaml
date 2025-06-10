@@ -6,7 +6,7 @@ on:
     inputs:
       imageName:
         description: 'Container image name (e.g., myacr.azurecr.io/app:latest)'
-        default: 'anycompanyacr.azurecr.io/salesapi:latest'     
+        default: 'anycompanyacr.azurecr.io/salesapi:83a7382ca47749cf34336e2d3c281f96a5816053'     
         required: true
       resourceGroup:
         description: 'Azure Resource Group'
