@@ -31,8 +31,7 @@ on:
 
 jobs:
   
-  deploy:
-    needs: buildImage
+  deploy:    
     permissions:
       actions: read
       contents: read
